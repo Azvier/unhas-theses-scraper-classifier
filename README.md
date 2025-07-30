@@ -1,4 +1,4 @@
-# UNHAS Statistics Theses Scraper & Classifier
+# UNHAS Theses Repository Scraper & Classifier
 
 A command-line tool that automates the collection, classification, and processing of undergraduate thesis data from Hasanuddin University's (UNHAS) digital repository. Features AI-powered thesis categorization using Google's Gemini API and exports data in multiple formats for academic research.
 
@@ -49,8 +49,8 @@ unhas-statistics-theses-scraping/
 
 ```bash
 # Clone repository
-git clone https://github.com/Azvier/unhas-statistics-theses-scraping.git
-cd unhas-statistics-theses-scraping
+git clone https://github.com/Azvier/unhas-theses-scraper-classifier.git
+cd unhas-theses-scraper-classifier
 
 # Install dependencies
 pdm install
