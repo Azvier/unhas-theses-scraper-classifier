@@ -188,7 +188,7 @@ def display_operation_menu() -> str:
     operations = [
         ("scrape", "Scrape thesis data only"),
         ("classify", "Classify existing data only"), 
-        ("export", "Export existing data to Excel"),
+        ("export_excel", "Export existing data to Excel"),
         ("simplify", "Create simplified JSON from existing data"),
         ("all", "Run full pipeline (scrape + classify + export)"),
     ]
