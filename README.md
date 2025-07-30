@@ -1,133 +1,179 @@
 # UNHAS Statistics Theses Scraper & Classifier
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+A command-line tool that automates the collection, classification, and processing of undergraduate thesis data from Hasanuddin University's (UNHAS) digital repository. Features AI-powered thesis categorization using Google's Gemini API and exports data in multiple formats for academic research.
 
-A command-line tool to scrape, classify, and process undergraduate thesis data from the Hasanuddin University (UNHAS) Statistics Department repository.
+## ✨ Features
 
-## 🚀 Features
+- **🎓 Complete Coverage**: Dynamic discovery of all 17 UNHAS faculties and their majors
+- **🤖 AI Classification**: Intelligent thesis categorization with primary/secondary focus detection
+- **📊 Multiple Formats**: Export to JSON, Excel, and simplified formats
+- **🎯 Interactive Mode**: Guided CLI with progress indicators and rich formatting
 
-- **Data Scraping**: Automatically scrapes thesis metadata, including titles, authors, and abstracts, from the [UNHAS Repository](https://repository.unhas.ac.id/view/divisions/statistika/).
-- **AI-Powered Classification**: Uses the Google Gemini API to intelligently classify each thesis into predefined statistical categories (e.g., *Regression*, *Time Series Analysis*, *Machine Learning*).
-- **Multiple Output Formats**: Exports the processed data into both JSON and Excel formats for further analysis.
-- **Modular Architecture**: Built with a clear and modular structure, separating scraping, classification, and data processing logic.
-- **CLI Interface**: Provides a user-friendly command-line interface to run individual tasks or the entire pipeline.
+## 🏗️ Architecture
 
-## 🏛️ Architecture and Workflow
+```
+UNHAS Repository → Discovery → Scraping → Raw JSON → AI Classification → Processed Data → Export
+```
 
-The project follows a sequential pipeline:
+1. **Dynamic Discovery**: Detects available faculties/majors from university website
+2. **Web Scraping**: Extracts thesis metadata using Selenium WebDriver
+3. **AI Classification**: Processes abstracts through Google Gemini API
+4. **Export Processing**: Generates multiple output formats
 
-1.  **Scraping**: The `scraper.py` module uses `selenium` to navigate the UNHAS repository, extract thesis data year by year, and save it into a structured JSON file.
-2.  **Classification**: The `classifier.py` module reads the scraped data, sends the title and abstract of each thesis to the Gemini API for categorization, and saves the enriched data in a new JSON file.
-3.  **Processing**: The `data_processor.py` module provides utilities to:
-    - Convert the final classified JSON data into a user-friendly Excel file.
-    - Generate a simplified JSON file containing only the essential fields (title, abstract, study focus).
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
 unhas-statistics-theses-scraping/
-├── .gitignore
-├── main.py
-├── pdm.lock
-├── pyproject.toml
-├── readme-instruction.md
-├── README.md
-├── notebooks/
-│   └── legacy/
-│       └── scraping.ipynb
-├── output/
-│   └── (Generated files will appear here)
-└── src/
-    ├── classification/
-    │   └── classifier.py   # AI-based thesis classification
-    ├── processing/
-    │   └── data_processor.py # Data export (JSON, Excel)
-    └── scraping/
-        └── scraper.py      # Web scraping logic
+├── src/
+│   ├── cli/interface.py          # Interactive CLI interface
+│   ├── config/settings.py        # Configuration management
+│   ├── classification/classifier.py # AI-powered classification
+│   ├── processing/data_processor.py # Multi-format exports
+│   └── scraping/
+│       ├── scraper.py            # Core scraping logic
+│       └── discovery.py          # Faculty/major discovery
+├── main.py                       # CLI application entry point
+├── config.yaml                   # Configuration file
+└── output/                       # Generated data files
 ```
 
--   **`main.py`**: The main entry point for the command-line interface.
--   **`src/scraping`**: Contains the web scraping logic.
--   **`src/classification`**: Handles the AI-powered classification of theses.
--   **`src/processing`**: Includes functions for data conversion and simplification.
--   **`output/`**: The default directory for all generated output files.
-
-## 🏁 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
--   Python 3.12+
--   [PDM](https://pdm-project.org/) for package management.
+- **Python 3.12**: Required for optimal performance
+- **PDM**: Modern Python dependency manager (`pip install pdm`)
+- **Google Gemini API Key**: For AI-powered classification ([Get API Key](https://aistudio.google.com/app/apikey))
+- **Chrome/Chromium**: For web scraping automation
 
 ### Installation
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-username/unhas-statistics-theses-scraping.git
-    cd unhas-statistics-theses-scraping
-    ```
-
-2.  **Install dependencies using PDM:**
-    ```bash
-    pdm install
-    ```
-
-3.  **Set up your API Key:**
-    - Create a file named `.env` in the project root.
-    - Add your Google Gemini API key to it:
-      ```
-      GOOGLE_API_KEY="YOUR_API_KEY_HERE"
-      ```
-
-## ⚙️ Usage
-
-The script is run via `main.py` and accepts several commands.
-
-### Run the Full Pipeline
-
-To execute the entire workflow (scrape, classify, and export), run:
-
 ```bash
-pdm run python main.py all
+# Clone repository
+git clone https://github.com/Azvier/unhas-statistics-theses-scraping.git
+cd unhas-statistics-theses-scraping
+
+# Install dependencies
+pdm install
+
+# Set API key
+echo 'GOOGLE_API_KEY="your_api_key_here"' > .env
+
+# Run application
+pdm run python main.py --interactive
 ```
 
-This will create four output files in the `output/` directory:
-- `unhas_repository_[timestamp].json` (raw scraped data)
-- `unhas_repository_classified_[timestamp].json` (data with classification)
-- `unhas_repository_classified_[timestamp].xlsx` (classified data in Excel format)
-- `unhas_repository_simplified_[timestamp].json` (simplified data)
+## 📖 Usage
 
-### Run Individual Commands
+### Interactive Mode (Recommended)
+The most user-friendly way to use the application:
 
-You can also run each step individually.
+```bash
+pdm run python main.py --interactive
+```
 
--   **Scrape Data:**
-    ```bash
-    pdm run python main.py scrape
-    ```
+### Command Line Examples
+For automation and scripting:
 
--   **Classify Data:**
-    *(Requires a scraped JSON file as input)*
-    ```bash
-    pdm run python main.py classify --input_file "output/unhas_repository_[timestamp].json"
-    ```
+```bash
+# Discover available faculties/majors
+pdm run python main.py discover
 
--   **Export to Excel:**
-    *(Requires a classified JSON file as input)*
-    ```bash
-    pdm run python main.py export_excel --input_file "output/unhas_repository_classified_[timestamp].json"
-    ```
+# Full pipeline with specific faculty/major
+pdm run python main.py all --faculty "Fakultas Teknik" --major "Teknik Elektro"
 
--   **Simplify Data:**
-    *(Requires a classified JSON file as input)*
-    ```bash
-    pdm run python main.py simplify --input_file "output/unhas_repository_classified_[timestamp].json"
-    ```
+# Individual operations
+pdm run python main.py scrape --faculty "Fakultas Matematika dan Ilmu Peng. Alam" --major "Statistika"
+pdm run python main.py classify --input_file output/scraped_data.json
+pdm run python main.py export_excel --input_file output/classified_data.json
 
-## 📝 Note on Data
+# List available options
+pdm run python main.py list-faculties
+pdm run python main.py list-majors --faculty "Fakultas Teknik"
+```
 
-This repository contains the code to scrape and process data. The actual thesis data is not included but can be fully reproduced by running the scraping script. The final output will be a clean, classified, and structured dataset ready for analysis.
+## ⚙️ Configuration
 
-## 📜 License
+The system uses `config.yaml` with environment variable support:
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+```yaml
+# API Settings
+google_api_key: ${GOOGLE_API_KEY}  # Set in .env file
+gemini_model: gemini-2.5-pro
+
+# Basic Settings
+output_dir: output
+headless_browser: true
+batch_size: 20
+user_defined_categories: false  # Set to true for custom classification
+
+# Custom Classification Categories
+# Customize these categories for your specific research domain
+classification_categories:
+  default:
+    Teori: Penelitian yang fokus pada pengembangan teori dan konsep fundamental.
+    Aplikasi: Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.
+    Eksperimental: Penelitian yang melibatkan eksperimen dan pengujian empiris.
+    # Add more categories as needed...
+```
+
+**Note**: For domain-specific classification (e.g., statistics), modify the `classification_categories` section with detailed, non-overlapping category definitions to prevent misclassification.
+
+## 📊 Output Formats
+
+### Raw Data
+```json
+{
+  "2023": {
+    "Thesis Title": {
+      "author": "Student Name",
+      "abstract": "Complete abstract...",
+      "faculty": "Fakultas Matematika dan Ilmu Peng. Alam",
+      "major": "Statistika",
+      "url": "https://repository.unhas.ac.id/..."
+    }
+  }
+}
+```
+
+### Classified Data
+```json
+{
+  "study_focus": {
+    "primary": "Machine Learning",
+    "secondary": "Regresi"
+  }
+}
+```
+
+## 🎓 Supported Faculties
+
+All 17 UNHAS faculties are supported through dynamic discovery:
+- Fakultas Teknik, Matematika dan Ilmu Peng. Alam, Kedokteran, Farmasi, Hukum
+- Fakultas Ekonomi dan Bisnis, Ilmu Kelautan dan Perikanan
+- And 10+ more with automatic major detection
+
+## 🛠️ Data Reproducibility
+
+This project is fully reproducible:
+- All data scraped from public UNHAS repository
+- Automated faculty/major discovery
+- API-based classification for consistent results
+- No external data dependencies required
+
+## 🤝 Contributing
+
+Contributions welcome! Please feel free to submit pull requests or open issues for bugs, features, or improvements.
+
+**Areas for contribution:**
+- Additional university support
+- Enhanced classification categories
+- New export formats
+- Performance optimizations
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Note**: This tool is for academic research. Please comply with university terms of service and use responsibly.
