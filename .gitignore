@@ -5,8 +5,7 @@ TODO.md
 .vscode/
 
 # Output
-output/legacy
-output/testing
+output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
