@@ -1,8 +1,9 @@
 # VS Code
 .vscode/
 
-# Legacy output
+# Output
 output/legacy
+output/testing
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
