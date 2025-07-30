@@ -1,12 +1,105 @@
 
 import json
 import os
+import re
 from datetime import datetime
 import pandas as pd
 
 from ..config.settings import Config
 
 
+def sanitize_xml_text(text):
+    """
+    Sanitize text to remove characters that are illegal in XML/Excel.
+    
+    This function replaces Unicode characters that can cause XML parsing errors
+    when creating Excel files. XML 1.0 specification allows only:
+    - #x9 (tab), #xA (LF), #xD (CR)  
+    - #x20-#xD7FF (excluding #xD800-#xDFFF surrogate pairs)
+    - #xE000-#xFFFD (excluding #xFFFE-#xFFFF)
+    - #x10000-#x10FFFF
+    """
+    if not isinstance(text, str):
+        return text
+    
+    # Dictionary of problematic characters and their replacements
+    replacements = {
+        # Smart quotes
+        '"': '"',  # Left double quotation mark  
+        '"': '"',  # Right double quotation mark  
+        ''': "'",  # Left single quotation mark
+        ''': "'",  # Right single quotation mark
+        
+        # Dashes
+        '—': '-',  # Em dash
+        '–': '-',  # En dash
+        
+        # Superscript numbers
+        '⁰': '0',
+        '¹': '1', 
+        '²': '2',
+        '³': '3',
+        '⁴': '4',
+        '⁵': '5',
+        '⁶': '6',
+        '⁷': '7',
+        '⁸': '8',
+        '⁹': '9',
+        '⁻': '-',  # Superscript minus
+        
+        # Subscript numbers
+        '₀': '0',
+        '₁': '1',
+        '₂': '2', 
+        '₃': '3',
+        '₄': '4',
+        '₅': '5',
+        '₆': '6',
+        '₇': '7',
+        '₈': '8',
+        '₉': '9',
+        
+        # Mathematical symbols
+        '×': 'x',  # Multiplication sign
+        '±': '+/-',  # Plus-minus sign
+        '≤': '<=',  # Less than or equal to
+        '≥': '>=',  # Greater than or equal to
+        
+        # Greek letters (common in scientific texts)
+        'α': 'alpha',
+        'β': 'beta', 
+        'γ': 'gamma',
+        'δ': 'delta',
+        'λ': 'lambda',
+        'μ': 'mu',
+        'µ': 'mu',  # Micro sign
+        'π': 'pi',
+        'σ': 'sigma',
+        'Ω': 'Omega',  # Greek Omega (also covers Ohm sign which has same appearance)
+        
+        # Degree and temperature symbols
+        '°': ' deg',  # Degree sign
+        '℃': 'C',    # Celsius
+        '℉': 'F',    # Fahrenheit
+        '˚': ' deg',  # Ring above (degree)
+        
+        # Other problematic characters
+        '…': '...',  # Horizontal ellipsis
+    }
+    
+    # Apply replacements
+    sanitized_text = text
+    for old_char, new_char in replacements.items():
+        sanitized_text = sanitized_text.replace(old_char, new_char)
+    
+    # Remove XML-illegal control characters (keep tab, LF, CR)
+    # XML 1.0 illegal: #x0-#x8, #xB, #xC, #xE-#x1F, #xFFFE, #xFFFF
+    sanitized_text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFE\uFFFF]', '', sanitized_text)
+    
+    # Remove surrogate pairs (invalid in XML)
+    sanitized_text = re.sub(r'[\uD800-\uDFFF]', '', sanitized_text)
+    
+    return sanitized_text
 def extract_faculty_major_from_filename(input_path: str) -> tuple:
     """
     Extract faculty and major names from the input filename.
@@ -103,6 +196,11 @@ def convert_json_to_excel(input_path: str, output_dir: str = "output", config: C
     final_columns = ordered_columns + remaining_columns
     
     df = df[final_columns]
+    
+    # Sanitize all text columns to prevent XML parsing errors in Excel
+    for col in df.columns:
+        if df[col].dtype == 'object':  # String columns
+            df[col] = df[col].apply(sanitize_xml_text)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
