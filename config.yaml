@@ -1,0 +1,578 @@
+# UNHAS Theses Scraper Configuration
+# Please review and customize the settings below
+
+# API Settings
+google_api_key: ${GOOGLE_API_KEY}  # Set this in your .env file
+gemini_model: gemini-2.5-pro
+
+# Scraping Settings
+output_dir: output
+headless_browser: True
+scraping_delay: 1.0
+
+# Classification Settings
+batch_size: 20
+classification_retries: 3
+target_major: ""
+target_faculty: ""
+
+# Processing Settings
+enable_excel_export: True
+enable_simplified_json: True
+enable_dynamic_discovery: True
+user_defined_categories: False
+verbose_logging: False
+
+# Classification Categories
+classification_categories:
+  default:
+    Teori: Penelitian yang fokus pada pengembangan teori dan konsep fundamental.
+    Aplikasi: Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.
+    Eksperimental: Penelitian yang melibatkan eksperimen dan pengujian empiris.
+    Komputasi: Penelitian yang menggunakan metode komputasi dan simulasi.
+    Analisis Data: Penelitian yang fokus pada analisis dan interpretasi data.
+    Lainnya: Kategori untuk penelitian yang tidak termasuk dalam kategori lain.
+
+# NOTE: Please customize these categories for your research domain!
+# Make sure distinctions between categories are clear to prevent misclassification.
+# Below is an example of how you might define categories for classification task for statistics major:
+
+# classification_categories:
+#   default:
+#     Regresi: Fokus pada **inferensi statistik** untuk memahami dan mengukur hubungan antar variabel menggunakan model dengan **bentuk fungsional yang telah ditentukan** (misalnya, linear, logistik). Tujuan utamanya adalah menjelaskan *seberapa besar* pengaruh satu variabel terhadap variabel lain.
+#     Regresi Nonparametrik: Fokus pada pemodelan hubungan antar variabel **TANPA asumsi bentuk fungsional tertentu**. Metode ini sangat fleksibel dan digunakan ketika pola data kompleks, non-linear, dan tidak diketahui sebelumnya. Tujuannya adalah membiarkan data 'berbicara' untuk membentuk modelnya sendiri.
+#     Pengendalian Kualitas Statistika: Fokus pada **pemantauan (monitoring) proses yang sedang berjalan** untuk memastikan stabilitas dan konsistensi output. Alat utamanya adalah **peta kendali (control chart)** untuk mendeteksi variasi yang tidak wajar secara visual dan menjaga proses tetap dalam spesifikasi.
+#     Perancangan Percobaan: Fokus pada **perancangan eksperimen secara proaktif SEBELUM data dikumpulkan**. Tujuannya adalah untuk secara efisien membandingkan efek dari berbagai **perlakuan (treatments)** melalui intervensi aktif untuk menemukan pengaturan atau kondisi yang paling optimal.
+#     Analisis Runtun Waktu: Fokus pada **analisis data yang variabel utamanya adalah waktu**. Metode ini secara khusus menangani data dengan **ketergantungan temporal** (nilai saat ini dipengaruhi oleh nilai sebelumnya). Tujuan utamanya adalah memahami pola historis dan melakukan **peramalan (forecasting)**.
+#     Machine Learning: Fokus utama pada **akurasi prediksi**. Tujuannya adalah membangun algoritma yang dapat belajar dari data untuk membuat prediksi atau klasifikasi seakurat mungkin, seringkali **mengorbankan interpretasi model** demi performa prediktif yang superior.
+#     Analisis Data Spasial: Fokus pada **analisis data yang variabel utamanya adalah lokasi geografis**. Metode ini secara khusus menangani data dengan **ketergantungan spasial** (nilai di satu lokasi dipengaruhi oleh nilai di lokasi tetangganya). Fokus utamanya adalah pemetaan dan pemodelan **autokorelasi spasial**.
+#     Analisis Survival: Fokus pada **metode statistik khusus untuk menganalisis data 'waktu-ke-kejadian' (time-to-event)**. Fokusnya adalah memodelkan waktu hingga suatu peristiwa terjadi dan menangani **data tersensor (censored data)**, di mana peristiwa tersebut tidak diamati untuk semua subjek.
+#     Ekonometrika dan Manajemen Risiko: Fokus pada **aplikasi statistik khusus pada data keuangan dan ekonomi** untuk mengukur dan mengelola risiko. Fokus utamanya adalah kuantifikasi risiko investasi melalui metrik seperti **Value at Risk (VaR) dan CVaR**, pemodelan portofolio, dan analisis dependensi aset.
+#     Lainnya: Fokus pada **kategori untuk metodologi statistik yang tidak memiliki karakteristik unik dari kategori lain yang telah disebutkan**. Contohnya meliputi **psikometri, bioinformatika, atau analisis data kategorik murni**.
+
+#======================================================================
+# AUTO-GENERATED CONTENT - DO NOT EDIT MANUALLY
+# The following section is populated by dynamic discovery
+# Use 'pdm run python main.py discover' to update
+#======================================================================
+
+faculties:
+  fakultas-ekonomi:
+    display_name: Fakultas Ekonomi
+    majors:
+      akuntansi:
+        display_name: Akuntansi
+        url: https://repository.unhas.ac.id/view/divisions/akuntansi/
+      ekonomi-pembangunan-dan-perencanaan:
+        display_name: Ekonomi Pembangunan Dan Perencanaan
+        url: https://repository.unhas.ac.id/view/divisions/ekonomi=5Fpembangunan=5Fperencanaan/
+      ekonomi-sumberdaya:
+        display_name: Ekonomi Sumberdaya
+        url: https://repository.unhas.ac.id/view/divisions/ekonomi=5Fsumberadaya/
+      ilmu-akuntasi:
+        display_name: Ilmu Akuntasi
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fakuntansi/
+      ilmu-ekonomi:
+        display_name: Ilmu Ekonomi
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fekonomi/
+      keuangan-daerah:
+        display_name: Keuangan Daerah
+        url: https://repository.unhas.ac.id/view/divisions/keuangan=5Fdaerah/
+      keuangan-mikro:
+        display_name: Keuangan Mikro
+        url: https://repository.unhas.ac.id/view/divisions/keuangan=5Fmikro/
+      manajemen:
+        display_name: Manajemen
+        url: https://repository.unhas.ac.id/view/divisions/manajemen/
+      manajemen-keuangan:
+        display_name: Manajemen Keuangan
+        url: https://repository.unhas.ac.id/view/divisions/manajemen=5Fkeuangan/
+      program-profesi-akuntansi:
+        display_name: Program Profesi Akuntansi
+        url: https://repository.unhas.ac.id/view/divisions/profesi=5Fakuntansi/
+  fakultas-farmasi:
+    display_name: Fakultas Farmasi
+    majors:
+      farmasi:
+        display_name: Farmasi
+        url: https://repository.unhas.ac.id/view/divisions/farmasi=5Fprodi/
+      ilmu-farmasi:
+        display_name: Ilmu Farmasi
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Ffarmasi/
+  fakultas-hukum:
+    display_name: Fakultas Hukum
+    majors:
+      hukum-administrasi-negara:
+        display_name: Hukum Administrasi Negara
+        url: https://repository.unhas.ac.id/view/divisions/administrasi=5Fnegara/
+      ilmu-hukum:
+        display_name: Ilmu Hukum
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fhukum/
+      kenotariatan:
+        display_name: Kenotariatan
+        url: https://repository.unhas.ac.id/view/divisions/kenotariatan/
+  fakultas-ilmu-budaya:
+    display_name: Fakultas Ilmu Budaya
+    majors:
+      arkeologi:
+        display_name: Arkeologi
+        url: https://repository.unhas.ac.id/view/divisions/arkeologi/
+      bahasa-indonesia:
+        display_name: Bahasa Indonesia
+        url: https://repository.unhas.ac.id/view/divisions/bahasa=5Findonesia/
+      bahasa-inggris:
+        display_name: Bahasa Inggris
+        url: https://repository.unhas.ac.id/view/divisions/bahasa=5Finggris/
+      bahasa-mandarin:
+        display_name: Bahasa Mandarin
+        url: https://repository.unhas.ac.id/view/divisions/bahasa=5Fmandarin/
+      bahasa-mandarin-dan-kebudayaan-tiongkok:
+        display_name: Bahasa Mandarin Dan Kebudayaan Tiongkok
+        url: https://repository.unhas.ac.id/view/divisions/bahasa=5Fmandarin=5Fkebudayaan=5Ftiongkok/
+      ilmu-linguistik:
+        display_name: Ilmu Linguistik
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Flinguistik/
+      ilmu-sejarah:
+        display_name: Ilmu Sejarah
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fsejarah/
+      linguistik:
+        display_name: Linguistik
+        url: https://repository.unhas.ac.id/view/divisions/linguistik/
+      sastra-asia-barat:
+        display_name: Sastra Asia Barat
+        url: https://repository.unhas.ac.id/view/divisions/sastra=5Fasia=5Fbarat/
+      sastra-bugis-makassar:
+        display_name: Sastra Bugis Makassar
+        url: https://repository.unhas.ac.id/view/divisions/sastra=5Fbugis=5Fmakassar/
+      sastra-indonesia:
+        display_name: Sastra Indonesia
+        url: https://repository.unhas.ac.id/view/divisions/sastra=5Findonesia/
+      sastra-inggris:
+        display_name: Sastra Inggris
+        url: https://repository.unhas.ac.id/view/divisions/sastra=5Finggris/
+      sastra-jepang:
+        display_name: Sastra Jepang
+        url: https://repository.unhas.ac.id/view/divisions/sastra=5Fjepang/
+      sastra-prancis:
+        display_name: Sastra Prancis
+        url: https://repository.unhas.ac.id/view/divisions/sastra=5Fprancis/
+      sejarah:
+        display_name: Sejarah
+        url: https://repository.unhas.ac.id/view/divisions/sejarah/
+  fakultas-ilmu-kelautan-dan-perikanan:
+    display_name: Fakultas Ilmu Kelautan Dan Perikanan
+    majors:
+      agrobisnis-perikanan:
+        display_name: Agrobisnis Perikanan
+        url: https://repository.unhas.ac.id/view/divisions/agro=5Fbisnis/
+      budidaya-perairan:
+        display_name: Budidaya Perairan
+        url: https://repository.unhas.ac.id/view/divisions/budidaya=5Fperikanan/
+      ilmu-kelautan:
+        display_name: Ilmu Kelautan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkelautan/
+      ilmu-perikanan:
+        display_name: Ilmu Perikanan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fperikanan/
+      manajemen-sumberdaya-perairan:
+        display_name: Manajemen Sumberdaya Perairan
+        url: https://repository.unhas.ac.id/view/divisions/manajemen=5Fsumberdaya=5Fperairan/
+      pemanfaatan-sumberdaya-perikanan:
+        display_name: Pemanfaatan Sumberdaya Perikanan
+        url: https://repository.unhas.ac.id/view/divisions/pemanfaatan=5Fsumberdaya=5Fperikanan/
+      pengelolaan-sumberdaya-pesisir-terpadu:
+        display_name: Pengelolaan Sumberdaya Pesisir Terpadu
+        url: https://repository.unhas.ac.id/view/divisions/pengelolaan=5Fsumberdaya=5Fpesisir=5Fterpadu/
+      sosek-perikanan:
+        display_name: Sosek Perikanan
+        url: https://repository.unhas.ac.id/view/divisions/sosek=5Fperikanan/
+      teknologi-hasil-perikanan:
+        display_name: Teknologi Hasil Perikanan
+        url: https://repository.unhas.ac.id/view/divisions/tek=5Fperikanan/
+  fakultas-ilmu-sosial-dan-ilmu-politik:
+    display_name: Fakultas Ilmu Sosial Dan Ilmu Politik
+    majors:
+      administrasi-pembangunan:
+        display_name: Administrasi Pembangunan
+        url: https://repository.unhas.ac.id/view/divisions/administrasi=5Fpembangunan/
+      antropologi:
+        display_name: Antropologi
+        url: https://repository.unhas.ac.id/view/divisions/antropologi/
+      antropologi-sosial:
+        display_name: Antropologi Sosial
+        url: https://repository.unhas.ac.id/view/divisions/antropologi=5Fsosial/
+      ilmu-administrasi-negara:
+        display_name: Ilmu Administrasi Negara
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fadministrasi=5Fnegara/
+      ilmu-administrasi-publik:
+        display_name: Ilmu Administrasi Publik
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fadm=5Fpublik/
+      ilmu-antropologi:
+        display_name: Ilmu Antropologi
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fantropologi/
+      ilmu-hubungan-internasional:
+        display_name: Ilmu Hubungan Internasional
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fhub=5Finternasional/
+      ilmu-komunikasi:
+        display_name: Ilmu Komunikasi
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkomunikasi/
+      ilmu-pemerintahan:
+        display_name: Ilmu Pemerintahan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fpemerintahan/
+      ilmu-politik:
+        display_name: Ilmu Politik
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fpolitik/
+      ilmu-sosial:
+        display_name: Ilmu Sosial
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fsosial/
+      sosiologi:
+        display_name: Sosiologi
+        url: https://repository.unhas.ac.id/view/divisions/sosiologi/
+  fakultas-kedokteran:
+    display_name: Fakultas Kedokteran
+    majors:
+      ilmu-kedokteran:
+        display_name: Ilmu Kedokteran
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkedokteran/
+      ppds---ilmu-bedah-saraf:
+        display_name: Ppds   Ilmu Bedah Saraf
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fbedah=5Fsaraf/
+      ppds---ilmu-gizi-klinik:
+        display_name: Ppds   Ilmu Gizi Klinik
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fgizi=5Fklinik/
+      ppds---ilmu-penyakit-jantung-dan-pembuluh-darah:
+        display_name: Ppds   Ilmu Penyakit Jantung Dan Pembuluh Darah
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpenyakit=5Fjantung=5Fdan=5Fpembuluh=5Fdarah/
+      ppds---mikrobiologi-klinik:
+        display_name: Ppds   Mikrobiologi Klinik
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Fmikrobiologi=5Fklinik/
+      ppds---pulmonologi:
+        display_name: Ppds   Pulmonologi
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Fpulmonolgi/
+      ppds-anestesiologi:
+        display_name: Ppds Anestesiologi
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Fanestesiologi/
+      ppds-ilmu-bedah:
+        display_name: Ppds Ilmu Bedah
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fbedah/
+      ppds-ilmu-kedokteran-forensik-dan-medikolegal:
+        display_name: Ppds Ilmu Kedokteran Forensik Dan Medikolegal
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fkedokteran=5Fforensik=5Fdan=5Fmedikolegal/
+      ppds-ilmu-kedokteran-jiwa---psikiatri:
+        display_name: Ppds Ilmu Kedokteran Jiwa   Psikiatri
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fkedokteran=5Fjiwa=5Fpsikiatri/
+      ppds-ilmu-kesehatan-anak:
+        display_name: Ppds Ilmu Kesehatan Anak
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fkesehatan=5Fanak/
+      ppds-ilmu-patologi-klinik:
+        display_name: Ppds Ilmu Patologi Klinik
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpatologi=5Fklinik/
+      ppds-ilmu-penyakit-dalam:
+        display_name: Ppds Ilmu Penyakit Dalam
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpenyakit=5Fdalam/
+      ppds-ilmu-penyakit-kulit-dan-kelamin:
+        display_name: Ppds Ilmu Penyakit Kulit Dan Kelamin
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpenyakit=5Fkulit=5Fdan=5Fkelamin/
+      ppds-ilmu-penyakit-mata:
+        display_name: Ppds Ilmu Penyakit Mata
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpenyakit=5Fmata/
+      ppds-ilmu-penyakit-saraf:
+        display_name: Ppds Ilmu Penyakit Saraf
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpenyakit=5Fsaraf/
+      ppds-ilmu-penyakit-tht:
+        display_name: Ppds Ilmu Penyakit Tht
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fpenyakit=5Ftht/
+      ppds-ilmu-radiologi:
+        display_name: Ppds Ilmu Radiologi
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Filmu=5Fradiologi/
+      ppds-obstetri-dan-ginekologi:
+        display_name: Ppds Obstetri Dan Ginekologi
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Fobstetri=5Fdan=5Fginekologi/
+      ppds-orthopedi:
+        display_name: Ppds Orthopedi
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Forthopedi/
+      ppds-patologi-anatomi:
+        display_name: Ppds Patologi Anatomi
+        url: https://repository.unhas.ac.id/view/divisions/ppds=5Fpatologi=5Fanatomi/
+      pendidikan-dokter:
+        display_name: Pendidikan Dokter
+        url: https://repository.unhas.ac.id/view/divisions/pendidikan=5Fdokter/
+      pendidikan-dokter-hewan:
+        display_name: Pendidikan Dokter Hewan
+        url: https://repository.unhas.ac.id/view/divisions/pendidikan=5Fdokter=5Fhewan/
+      profesi-dokter:
+        display_name: Profesi Dokter
+        url: https://repository.unhas.ac.id/view/divisions/profesi=5Fdokter/
+      profesi-dokter-hewan:
+        display_name: Profesi Dokter Hewan
+        url: https://repository.unhas.ac.id/view/divisions/profesi=5Fdokter=5Fhewan/
+      psikologi:
+        display_name: Psikologi
+        url: https://repository.unhas.ac.id/view/divisions/psikologi/
+      vokasi-kesehatan:
+        display_name: Vokasi Kesehatan
+        url: https://repository.unhas.ac.id/view/divisions/vokasi=5Fkesehatan/
+  fakultas-kehutanan:
+    display_name: Fakultas Kehutanan
+    majors:
+      kehutanan:
+        display_name: Kehutanan
+        url: https://repository.unhas.ac.id/view/divisions/kehutanan=5Fprodi/
+      rekayasa-kehutanan:
+        display_name: Rekayasa Kehutanan
+        url: https://repository.unhas.ac.id/view/divisions/rekayasa=5Fkehutanan/
+  fakultas-keperawatan:
+    display_name: Fakultas Keperawatan
+    majors:
+      fisioterapi:
+        display_name: Fisioterapi
+        url: https://repository.unhas.ac.id/view/divisions/fisioterapi/
+      ilmu-keperawatan:
+        display_name: Ilmu Keperawatan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkeperawatan/
+      keperawatan:
+        display_name: Keperawatan
+        url: https://repository.unhas.ac.id/view/divisions/keperawatan=5Fprodi/
+      profesi-fisioterapi:
+        display_name: Profesi Fisioterapi
+        url: https://repository.unhas.ac.id/view/divisions/profesi=5Ffisioterapi/
+      profesi-keperawatan:
+        display_name: Profesi Keperawatan
+        url: https://repository.unhas.ac.id/view/divisions/profesi=5Fkeperawatan/
+  fakultas-kesehatan-masyarakat:
+    display_name: Fakultas Kesehatan Masyarakat
+    majors:
+      administrasi-kebijakan-kesehatan:
+        display_name: Administrasi Kebijakan Kesehatan
+        url: https://repository.unhas.ac.id/view/divisions/Admin=5Fkebijakan/
+      administrasi-rumah-sakit:
+        display_name: Administrasi Rumah Sakit
+        url: https://repository.unhas.ac.id/view/divisions/administrasi=5Frumah=5Fsakit/
+      ilmu-gizi:
+        display_name: Ilmu Gizi
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fgizi/
+      kesehatan-lingkungan:
+        display_name: Kesehatan Lingkungan
+        url: https://repository.unhas.ac.id/view/divisions/kesling/
+      kesehatan-masyarakat:
+        display_name: Kesehatan Masyarakat
+        url: https://repository.unhas.ac.id/view/divisions/kesehatan=5Fmasyarakat/
+      keselamatan-dan-kesehatan-kerja:
+        display_name: Keselamatan Dan Kesehatan Kerja
+        url: https://repository.unhas.ac.id/view/divisions/k3/
+  fakultas-matematika-dan-ilmu-peng-alam:
+    display_name: Fakultas Matematika Dan Ilmu Peng Alam
+    majors:
+      biologi:
+        display_name: Biologi
+        url: https://repository.unhas.ac.id/view/divisions/biologi/
+      fisika:
+        display_name: Fisika
+        url: https://repository.unhas.ac.id/view/divisions/fisika/
+      geofisika:
+        display_name: Geofisika
+        url: https://repository.unhas.ac.id/view/divisions/geofisika/
+      ilmu-aktuaria:
+        display_name: Ilmu Aktuaria
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Faktuaria/
+      ilmu-kimia:
+        display_name: Ilmu Kimia
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkimia/
+      ilmu-komputer:
+        display_name: Ilmu Komputer
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkomputer/
+      kimia:
+        display_name: Kimia
+        url: https://repository.unhas.ac.id/view/divisions/kimia/
+      matematika:
+        display_name: Matematika
+        url: https://repository.unhas.ac.id/view/divisions/matematika/
+      matematika-terapan:
+        display_name: Matematika Terapan
+        url: https://repository.unhas.ac.id/view/divisions/matematika=5Fterapan/
+      sistem-informasi:
+        display_name: Sistem Informasi
+        url: https://repository.unhas.ac.id/view/divisions/sistem=5Finformasi/
+      statistika:
+        display_name: Statistika
+        url: https://repository.unhas.ac.id/view/divisions/statistika/
+  fakultas-pendidikan-dokter-gigi:
+    display_name: Fakultas Pendidikan Dokter Gigi
+    majors:
+      biologi-oral:
+        display_name: Biologi Oral
+        url: https://repository.unhas.ac.id/view/divisions/biologi=5Foral/
+      ppdgs---bedah-mulut-dan-maksilofasial:
+        display_name: Ppdgs   Bedah Mulut Dan Maksilofasial
+        url: https://repository.unhas.ac.id/view/divisions/ppdgs=5Fbedah=5Fmulut=5Fdan=5Fmaksilofasial/
+      ppdgs---dokter-gigi-periodonsia:
+        display_name: Ppdgs   Dokter Gigi Periodonsia
+        url: https://repository.unhas.ac.id/view/divisions/ppdgs=5Fdokter=5Fgigi=5Fperiodonsia/
+      ppdgs---ilmu-konservasi-gigi:
+        display_name: Ppdgs   Ilmu Konservasi Gigi
+        url: https://repository.unhas.ac.id/view/divisions/ppdgs=5Filmu=5Fkonservasi=5Fgigi/
+      ppdgs---ortodonti:
+        display_name: Ppdgs   Ortodonti
+        url: https://repository.unhas.ac.id/view/divisions/ppdgs=5Fortodonti/
+      ppdgs---prostodonsia:
+        display_name: Ppdgs   Prostodonsia
+        url: https://repository.unhas.ac.id/view/divisions/ppdgs=5Fprostodonsia/
+      pendidikan-dokter-gigi:
+        display_name: Pendidikan Dokter Gigi
+        url: https://repository.unhas.ac.id/view/divisions/pendidikan=5Fdokter=5Fgigi/
+      profesi-dokter-gigi:
+        display_name: Profesi Dokter Gigi
+        url: https://repository.unhas.ac.id/view/divisions/profesi=5Fdokter=5Fgigi/
+  fakultas-pertanian:
+    display_name: Fakultas Pertanian
+    majors:
+      agribisnis:
+        display_name: Agribisnis
+        url: https://repository.unhas.ac.id/view/divisions/agribisnis/
+      agroteknologi:
+        display_name: Agroteknologi
+        url: https://repository.unhas.ac.id/view/divisions/agroteknologi/
+      budidaya-pertanian:
+        display_name: Budidaya Pertanian
+        url: https://repository.unhas.ac.id/view/divisions/budidaya=5Fpertanian/
+      ilmu-hama-dan-peny-tumbuhan:
+        display_name: Ilmu Hama Dan Peny Tumbuhan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fhama=5Fdan=5Fpeny=5Ftumbuhan/
+      ilmu-tanah:
+        display_name: Ilmu Tanah
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Ftanah/
+      ilmu-dan-teknologi-pangan:
+        display_name: Ilmu Dan Teknologi Pangan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fdan=5Fteknologi=5Fpangan/
+      keteknikan-pertanian:
+        display_name: Keteknikan Pertanian
+        url: https://repository.unhas.ac.id/view/divisions/keteknikan=5Fpertanian/
+      teknik-agroindustri:
+        display_name: Teknik Agroindustri
+        url: https://repository.unhas.ac.id/view/divisions/teknik=5Fagroindustri/
+      teknik-pertanian:
+        display_name: Teknik Pertanian
+        url: https://repository.unhas.ac.id/view/divisions/teknik=5Fpertanian/
+      teknologi-hasil-hutan:
+        display_name: Teknologi Hasil Hutan
+        url: https://repository.unhas.ac.id/view/divisions/teknologi=5Fhasil=5Fhutan/
+      teknologi-produksi-tanaman-pangan:
+        display_name: Teknologi Produksi Tanaman Pangan
+        url: https://repository.unhas.ac.id/view/divisions/teknologi=5Fproduksi=5Ftanaman=5Fpangan/
+  fakultas-peternakan:
+    display_name: Fakultas Peternakan
+    majors:
+      ilmu-dan-teknologi-peternakan:
+        display_name: Ilmu Dan Teknologi Peternakan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fdan=5Fteknologi=5Fpeternakan/
+      nutrisi-dan-makanan-ternak:
+        display_name: Nutrisi Dan Makanan Ternak
+        url: https://repository.unhas.ac.id/view/divisions/nutrisi=5Fdan=5Fmakanan=5Fternak/
+      peternakan:
+        display_name: Peternakan
+        url: https://repository.unhas.ac.id/view/divisions/peternakan=5Fsub/
+      sosek-peternakan:
+        display_name: Sosek Peternakan
+        url: https://repository.unhas.ac.id/view/divisions/sosek=5Fpeternakan/
+      teknologi-hasil-peternakan:
+        display_name: Teknologi Hasil Peternakan
+        url: https://repository.unhas.ac.id/view/divisions/teknologi=5Fhasil=5Fpeternakan/
+      teknologi-produksi-ternak:
+        display_name: Teknologi Produksi Ternak
+        url: https://repository.unhas.ac.id/view/divisions/teknologi=5Fproduksi=5Fternak/
+  fakultas-teknik:
+    display_name: Fakultas Teknik
+    majors:
+      ilmu-arsitektur:
+        display_name: Ilmu Arsitektur
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Farsitektur/
+      teknik-perencanaan-wilayah-kota:
+        display_name: Teknik Perencanaan Wilayah Kota
+        url: https://repository.unhas.ac.id/view/divisions/pwk/
+      teknologi-kebumian-dan-lingkungan:
+        display_name: Teknologi Kebumian Dan Lingkungan
+        url: https://repository.unhas.ac.id/view/divisions/kebumian=5Fdan=5Flingkungan/
+      teknik-arsitektur:
+        display_name: Teknik Arsitektur
+        url: https://repository.unhas.ac.id/view/divisions/arsitektur/
+      teknik-elektro:
+        display_name: Teknik Elektro
+        url: https://repository.unhas.ac.id/view/divisions/elektro/
+      teknik-geologi:
+        display_name: Teknik Geologi
+        url: https://repository.unhas.ac.id/view/divisions/geologi/
+      teknik-industri:
+        display_name: Teknik Industri
+        url: https://repository.unhas.ac.id/view/divisions/industri/
+      teknik-informatika:
+        display_name: Teknik Informatika
+        url: https://repository.unhas.ac.id/view/divisions/informatika/
+      teknik-kelautan:
+        display_name: Teknik Kelautan
+        url: https://repository.unhas.ac.id/view/divisions/kelautan/
+      teknik-lingkungan:
+        display_name: Teknik Lingkungan
+        url: https://repository.unhas.ac.id/view/divisions/lingkungan/
+      teknik-mesin:
+        display_name: Teknik Mesin
+        url: https://repository.unhas.ac.id/view/divisions/mesin/
+      teknik-perkapalan:
+        display_name: Teknik Perkapalan
+        url: https://repository.unhas.ac.id/view/divisions/perkapalan/
+      teknik-pertambangan:
+        display_name: Teknik Pertambangan
+        url: https://repository.unhas.ac.id/view/divisions/pertambangan/
+      teknik-sipil:
+        display_name: Teknik Sipil
+        url: https://repository.unhas.ac.id/view/divisions/sipil/
+      teknik-sistem-perkapalan:
+        display_name: Teknik Sistem Perkapalan
+        url: https://repository.unhas.ac.id/view/divisions/siskal/
+  fakultas-vokasi:
+    display_name: Fakultas Vokasi
+    majors:
+      teknologi-produksi-tanaman-pangan:
+        display_name: Teknologi Produksi Tanaman Pangan
+        url: https://repository.unhas.ac.id/view/divisions/Tanaman=5FPangan/
+      teknologi-produksi-ternak:
+        display_name: Teknologi Produksi Ternak
+        url: https://repository.unhas.ac.id/view/divisions/Produksi=5FTernak/
+  program-pascasarjana:
+    display_name: Program Pascasarjana
+    majors:
+      agribisnis:
+        display_name: Agribisnis
+        url: https://repository.unhas.ac.id/view/divisions/agribisnis=5Fs2/
+      ilmu-biomedik:
+        display_name: Ilmu Biomedik
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fbiomedik/
+      ilmu-kebidanan:
+        display_name: Ilmu Kebidanan
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fkebidanan/
+      ilmu-pertanian:
+        display_name: Ilmu Pertanian
+        url: https://repository.unhas.ac.id/view/divisions/ilmu=5Fpertanian/
+      jender-dan-pembangunan:
+        display_name: Jender Dan Pembangunan
+        url: https://repository.unhas.ac.id/view/divisions/jender=5Fdan=5Fpembangunan/
+      manajemen-bencana:
+        display_name: Manajemen Bencana
+        url: https://repository.unhas.ac.id/view/divisions/manajemen=5Fbencana/
+      manajemen-perkotaan:
+        display_name: Manajemen Perkotaan
+        url: https://repository.unhas.ac.id/view/divisions/manajemen=5Fperkotaan/
+      pengelolaan-lingkungan-hidup:
+        display_name: Pengelolaan Lingkungan Hidup
+        url: https://repository.unhas.ac.id/view/divisions/pengelolaan=5Flingkungan=5Fhidup/
+      perencanaan-dan-pengembangan-wilayah:
+        display_name: Perencanaan Dan Pengembangan Wilayah
+        url: https://repository.unhas.ac.id/view/divisions/perencanaan=5Fdan=5Fpengembangan=5Fwilayah/
+      sistem-sistem-pertanian:
+        display_name: Sistem Sistem Pertanian
+        url: https://repository.unhas.ac.id/view/divisions/sistem=5Fsistem=5Fpertanian/
+      teknik-perencanaan-prasarana:
+        display_name: Teknik Perencanaan Prasarana
+        url: https://repository.unhas.ac.id/view/divisions/teknik=5Fperencanaan=5Fprasarana/
+      teknik-transportasi:
+        display_name: Teknik Transportasi
+        url: https://repository.unhas.ac.id/view/divisions/teknik=5Ftransporasi/
