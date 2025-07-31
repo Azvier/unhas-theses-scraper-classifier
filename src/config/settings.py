@@ -243,6 +243,161 @@ def _update_config_from_dict(config: Config, config_dict: Dict[str, Any]):
                 setattr(config, key, value)
 
 
+def validate_classification_category_names(categories: Dict[str, str]) -> None:
+    """
+    Validate classification category names for illegal characters that could break YAML structure.
+    
+    Args:
+        categories: Dictionary of category names and descriptions.
+        
+    Raises:
+        ValueError: If any category name contains illegal characters.
+    """
+    # Characters that are problematic in YAML keys
+    illegal_chars = {
+        ':': 'colon (creates nested objects)',
+        '[': 'opening square bracket (creates arrays)',
+        ']': 'closing square bracket (creates arrays)', 
+        '{': 'opening curly brace (creates objects)',
+        '}': 'closing curly brace (creates objects)',
+        '|': 'pipe character (multiline scalar indicator)',
+        '>': 'greater than (folded scalar indicator)',
+        '#': 'hash (creates comments)',
+        '&': 'ampersand (anchor indicator)',
+        '*': 'asterisk (alias indicator)',
+        '!': 'exclamation (tag indicator)',
+        '%': 'percent (directive indicator)',
+        '@': 'at symbol (reserved)',
+        '`': 'backtick (reserved)',
+        '\n': 'newline character',
+        '\r': 'carriage return',
+        '\t': 'tab character'
+    }
+    
+    # Characters that should be avoided at the beginning
+    problematic_start_chars = {
+        '-': 'dash (creates list items)',
+        ' ': 'space (creates indentation issues)',
+        '\t': 'tab (creates indentation issues)'
+    }
+    
+    errors = []
+    
+    for category_name in categories.keys():
+        # Check for illegal characters anywhere in the name
+        for char, description in illegal_chars.items():
+            if char in category_name:
+                errors.append(f"Category '{category_name}' contains illegal character '{char}' ({description})")
+        
+        # Check for problematic starting characters
+        if category_name and category_name[0] in problematic_start_chars:
+            char = category_name[0]
+            description = problematic_start_chars[char]
+            errors.append(f"Category '{category_name}' starts with problematic character '{char}' ({description})")
+        
+        # Check for empty category names
+        if not category_name.strip():
+            errors.append("Found empty or whitespace-only category name")
+        
+        # Check for leading/trailing whitespace
+        if category_name != category_name.strip():
+            errors.append(f"Category '{category_name}' has leading or trailing whitespace")
+    
+    if errors:
+        error_msg = "Invalid classification category names found:\n"
+        for i, error in enumerate(errors, 1):
+            error_msg += f"  {i}. {error}\n"
+        error_msg += "\n💡 Tips for valid category names:\n"
+        error_msg += "  • Use alphanumeric characters, spaces, and hyphens\n"
+        error_msg += "  • Avoid special YAML characters like : [ ] { } | > # & * ! % @ `\n"
+        error_msg += "  • Don't start with dashes or spaces\n"
+        error_msg += "  • Trim leading/trailing whitespace\n"
+        error_msg += "  • Examples: 'Machine Learning', 'Data Analysis', 'Statistical-Modeling'\n"
+        
+        raise ValueError(error_msg)
+
+
+def sanitize_category_name(category_name: str) -> str:
+    """
+    Sanitize a category name by removing or replacing illegal characters.
+    
+    Args:
+        category_name: Original category name that may contain illegal characters.
+        
+    Returns:
+        Sanitized category name that's safe for YAML.
+    """
+    if not category_name:
+        return "Unnamed_Category"
+    
+    # Remove leading/trailing whitespace
+    sanitized = category_name.strip()
+    
+    # Replace illegal characters with safe alternatives
+    char_replacements = {
+        ':': ' -',  # colon -> space-dash
+        '[': '(',   # brackets -> parentheses  
+        ']': ')',
+        '{': '(',   # braces -> parentheses
+        '}': ')',
+        '|': ' or', # pipe -> "or"
+        '>': ' gt', # greater than -> "gt"
+        '#': ' num', # hash -> "num"
+        '&': ' and', # ampersand -> "and"
+        '*': ' all', # asterisk -> "all"
+        '!': '',    # exclamation -> remove
+        '%': ' pct', # percent -> "pct"
+        '@': ' at',  # at -> "at"
+        '`': "'",   # backtick -> single quote
+        '\n': ' ',  # newline -> space
+        '\r': ' ',  # carriage return -> space
+        '\t': ' '   # tab -> space
+    }
+    
+    for char, replacement in char_replacements.items():
+        sanitized = sanitized.replace(char, replacement)
+    
+    # Handle problematic starting characters
+    while sanitized and sanitized[0] in ['-', ' ', '\t']:
+        if sanitized[0] == '-':
+            sanitized = sanitized[1:]  # Remove leading dash
+        else:
+            sanitized = sanitized.lstrip()  # Remove leading whitespace
+    
+    # Clean up multiple spaces
+    import re
+    sanitized = re.sub(r'\s+', ' ', sanitized)
+    
+    # Final cleanup
+    sanitized = sanitized.strip()
+    
+    # Ensure we have a valid name
+    if not sanitized:
+        return "Unnamed_Category"
+    
+    return sanitized
+
+
+def suggest_category_fixes(categories: Dict[str, str]) -> Dict[str, str]:
+    """
+    Suggest sanitized versions of category names.
+    
+    Args:
+        categories: Dictionary of potentially problematic category names.
+        
+    Returns:
+        Dictionary mapping original names to suggested sanitized names.
+    """
+    suggestions = {}
+    
+    for original_name in categories.keys():
+        sanitized = sanitize_category_name(original_name)
+        if sanitized != original_name:
+            suggestions[original_name] = sanitized
+    
+    return suggestions
+
+
 def validate_config_basic(config: Config) -> None:
     """
     Perform basic configuration validation without prompts or discovery.
@@ -270,6 +425,10 @@ def validate_config_basic(config: Config) -> None:
     # Gemini model validation
     if not config.gemini_model:
         raise ValueError("Gemini model cannot be empty")
+    
+    # Classification category validation
+    if config.classification_categories:
+        validate_classification_category_names(config.classification_categories)
 
 
 def validate_config(config: Config) -> None:

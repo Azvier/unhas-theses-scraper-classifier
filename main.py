@@ -16,7 +16,7 @@ from rich.console import Console
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from src.config.settings import Config, load_config, validate_config, create_default_config_file, update_config_with_discovery, validate_scraping_config
+from src.config.settings import Config, load_config, validate_config, create_default_config_file, update_config_with_discovery, validate_scraping_config, suggest_category_fixes, validate_classification_category_names
 from src.classification.classifier import classify_theses
 from src.processing.data_processor import convert_json_to_excel, simplify_repository_data
 from src.scraping.scraper import scrape_repository
@@ -28,6 +28,70 @@ from src.cli.interface import (
 )
 
 console = Console()
+
+
+def handle_sanitize_categories(config: Config, config_path: str):
+    """
+    Handle the sanitize-categories command to check and fix illegal characters in category names.
+    
+    Args:
+        config: Configuration object with potentially problematic category names.
+        config_path: Path to the configuration file.
+    """
+    from rich.prompt import Confirm
+    
+    console.print("[bold blue]🧹 Classification Category Sanitizer[/bold blue]")
+    console.print("=" * 60)
+    
+    if not config.classification_categories:
+        console.print("[yellow]⚠️  No classification categories found in configuration.[/yellow]")
+        return
+    
+    # Check for issues
+    suggestions = suggest_category_fixes(config.classification_categories)
+    
+    if not suggestions:
+        console.print("[green]✅ All category names are valid! No illegal characters found.[/green]")
+        return
+    
+    console.print(f"[yellow]⚠️  Found {len(suggestions)} category names with illegal characters:[/yellow]\n")
+    
+    # Display suggestions
+    for original, suggested in suggestions.items():
+        console.print(f"  [red]'{original}'[/red] → [green]'{suggested}'[/green]")
+    
+    console.print("\n[cyan]💡 Issues detected:[/cyan]")
+    console.print("  • Colons (:) create nested YAML objects")
+    console.print("  • Brackets/braces ([]{}|) have special YAML meanings") 
+    console.print("  • Leading dashes (-) create list items")
+    console.print("  • Special characters (#&*!%@`) can break YAML parsing")
+    
+    if not Confirm.ask("\n[bold]Do you want to automatically fix these category names?[/bold]", default=True):
+        console.print("[yellow]Operation cancelled. You can manually edit your config file.[/yellow]")
+        return
+    
+    # Apply fixes
+    console.print("\n[blue]🔧 Applying fixes...[/blue]")
+    
+    # Create new categories dict with fixed names
+    new_categories = {}
+    for original_name, description in config.classification_categories.items():
+        if original_name in suggestions:
+            new_name = suggestions[original_name]
+            new_categories[new_name] = description
+            console.print(f"  ✅ Fixed: '{original_name}' → '{new_name}'")
+        else:
+            new_categories[original_name] = description
+    
+    # Update config and save
+    config.classification_categories = new_categories
+    config.save_config(config_path)
+    
+    console.print(f"\n[green]✅ Successfully updated {len(suggestions)} category names![/green]")
+    console.print(f"[cyan]📁 Configuration saved to: {config_path}[/cyan]")
+    console.print("\n[yellow]💡 Next steps:[/yellow]")
+    console.print("  • Run 'python main.py validate-config' to verify changes")
+    console.print("  • Review the updated categories in your config file")
 
 
 def create_parser():
@@ -71,6 +135,9 @@ Examples:
   # Validate current configuration
   python main.py validate-config
   
+  # Check and fix illegal characters in category names
+  python main.py sanitize-categories
+  
   # Discover all available faculties and majors from UNHAS website
   python main.py discover
 
@@ -86,7 +153,7 @@ Note: Faculty and major names can be specified using either:
         nargs="?",
         choices=["scrape", "classify", "simplify", "export_excel", "all", 
                 "list-majors", "list-faculties", "create-config", "validate-config",
-                "discover", "update-config"],
+                "discover", "update-config", "sanitize-categories"],
         default="all",
         help="The command to execute (default: all)"
     )
@@ -535,7 +602,7 @@ def main():
         config_path = args.config if args.config else "config.yaml"
         
         # Special handling for commands that need a config file but it doesn't exist
-        commands_needing_config = ["validate-config", "scrape", "classify", "all", "list-faculties", "list-majors"]
+        commands_needing_config = ["validate-config", "sanitize-categories", "scrape", "classify", "all", "list-faculties", "list-majors"]
         if args.command in commands_needing_config and not os.path.exists(config_path):
             console.print(f"[yellow]⚠️  Config file not found: {config_path}[/yellow]")
             console.print("[blue]🔧 Creating default configuration file...[/blue]")
@@ -565,6 +632,11 @@ def main():
         if args.command == "validate-config":
             validate_config(config)
             console.print("[green]✅ Configuration is valid![/green]")
+            return
+        
+        # Sanitize category names
+        if args.command == "sanitize-categories":
+            handle_sanitize_categories(config, args.config if args.config else "config.yaml")
             return
         
         # NOTE: Classification validation is now handled within classify_theses function
