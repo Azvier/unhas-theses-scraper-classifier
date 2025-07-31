@@ -400,6 +400,7 @@ def main():
         try:
             from src.scraping.discovery import UNHASRepositoryDiscovery
             console.print("[blue]🔍 Starting dynamic discovery of UNHAS faculties and majors...[/blue]")
+            console.print("[cyan]Using the new efficient discovery system that gets all data from the main page![/cyan]")
             
             # Determine config file path
             config_path = args.config if args.config else "config.yaml"
@@ -409,23 +410,27 @@ def main():
                 config = load_config(config_path)
                 verbose = config.verbose_logging
             except Exception:
-                console.print(f"[yellow]⚠️  Config file not found. Creating default configuration...[/yellow]")
+                console.print("[yellow]⚠️  Config file not found. Creating default configuration...[/yellow]")
                 create_default_config_file(config_path)
                 config = load_config(config_path)
                 verbose = config.verbose_logging
             
             discovery = UNHASRepositoryDiscovery(headless=not args.no_headless, verbose=verbose)
-            discovered_data = discovery.discover_all_faculties_and_majors()
+            
+            # Use the new efficient discovery method
+            discovered_data = discovery.discover_faculties_and_majors_from_main_page()
             
             if discovered_data:
-                console.print(f"\n[green]✅ Discovery completed! Found {len(discovered_data)} faculties:[/green]")
+                total_faculties = len(discovered_data)
+                total_majors = sum(len(majors) for majors in discovered_data.values())
+                
+                console.print(f"\n[green]✅ Discovery completed! Found {total_faculties} faculties with {total_majors} total majors:[/green]")
                 
                 # Check if config already has faculties (warn about merge)
                 if hasattr(config, 'faculties') and config.faculties:
-                    console.print("\n[yellow]ℹ️  Existing faculty configuration detected. Merging with discovered data...[/yellow]")
-                    console.print("[dim]- Existing faculty/major display names will be preserved[/dim]")
-                    console.print("[dim]- New faculties and majors will be added[/dim]")
-                    console.print("[dim]- URLs will be updated to latest values[/dim]")
+                    console.print("\n[yellow]ℹ️  Existing faculty configuration detected. Updating with discovered data...[/yellow]")
+                    console.print("[dim]- Faculty and major data will be updated with latest from repository[/dim]")
+                    console.print("[dim]- URLs will be updated to current values[/dim]")
                 
                 # Display discovered data
                 for faculty_key, majors in discovered_data.items():
