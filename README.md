@@ -23,18 +23,36 @@ UNHAS Repository → Discovery → Scraping → Raw JSON → AI Classification �
 ## 📁 Project Structure
 
 ```
-unhas-statistics-theses-scraping/
-├── src/
-│   ├── cli/interface.py          # Interactive CLI interface
-│   ├── config/settings.py        # Configuration management
-│   ├── classification/classifier.py # AI-powered classification
-│   ├── processing/data_processor.py # Multi-format exports
+unhas-theses-scraper-classifier/
+├── src/                         # Source code modules
+│   ├── __init__.py
+│   ├── classification/
+│   │   └── service.py           # AI-powered classification service
+│   ├── cli/
+│   │   └── service.py           # Interactive CLI interface
+│   ├── config/
+│   │   └── service.py           # Configuration management
+│   ├── core/
+│   │   ├── abstractions.py      # Core abstractions and interfaces
+│   │   ├── orchestrator.py      # Main workflow orchestrator
+│   │   ├── utils.py             # Utility functions
+│   │   └── webdriver.py         # WebDriver management
+│   ├── discovery/
+│   │   ├── __init__.py
+│   │   └── service.py           # Faculty/major discovery
+│   ├── processing/
+│   │   ├── __init__.py
+│   │   └── service.py           # Multi-format exports and data processing
 │   └── scraping/
-│       ├── scraper.py            # Core scraping logic
-│       └── discovery.py          # Faculty/major discovery
-├── main.py                       # CLI application entry point
-├── config.yaml                   # Configuration file
-└── output/                       # Generated data files
+│       ├── __init__.py
+│       └── service.py           # Core scraping logic
+├── legacy/                      # Legacy monolithic implementation files
+│   └── ...
+├── output/                      # Generated data files
+├── main.py                      # CLI application entry point
+├── config.yaml                  # Configuration file
+├── pyproject.toml               # PDM project configuration
+└── pdm.lock                     # Dependency lock file
 ```
 
 ## 🚀 Getting Started
