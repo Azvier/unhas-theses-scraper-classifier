@@ -44,7 +44,7 @@ class UNHASRepositoryDiscovery:
     """Dynamically discover faculties and majors from UNHAS repository."""
     
     def __init__(self, headless: bool = True, verbose: bool = False):
-        self.base_url = "https://repository.unhas.ac.id/view/divisions/divisions/"
+        self.base_url = "https://repository.unhas.ac.id/view/divisions/"
         self.headless = headless
         self.verbose = verbose
         self.driver = None
@@ -104,6 +104,94 @@ class UNHASRepositoryDiscovery:
             self.driver.quit()
             self.driver = None
     
+    def discover_faculties_and_majors_from_main_page(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        """
+        Discover all faculties and their majors from the main divisions page.
+        This is more efficient as it gets everything from a single page.
+        
+        Returns:
+            Nested dict: {faculty_key: {major_key: {'name': str, 'url': str}}}
+        """
+        if not self.driver:
+            self._init_driver()
+
+        if self.verbose:
+            print("🔍 Discovering faculties and majors from main divisions page...")
+        
+        self.driver.get(self.base_url)
+        time.sleep(3)
+        
+        faculties_and_majors = {}
+        
+        try:
+            # Get all main list items that contain faculties
+            main_list_items = self.driver.find_elements(By.XPATH, "/html/body/div[1]/div/div[2]/div/ul/li")
+            
+            for main_item in main_list_items:
+                try:
+                    # Look for faculty sublists within this main item
+                    faculty_sublists = main_item.find_elements(By.XPATH, "./ul")
+                    
+                    for faculty_index, faculty_sublist in enumerate(faculty_sublists, 1):
+                        # Get faculty link
+                        faculty_links = faculty_sublist.find_elements(By.XPATH, "./li/a")
+                        
+                        for faculty_link in faculty_links:
+                            faculty_name = faculty_link.text.strip()
+                            faculty_url = faculty_link.get_attribute('href')
+                            
+                            if faculty_name and faculty_url and 'divisions' in faculty_url:
+                                faculty_key = self._clean_name(faculty_name)
+                                
+                                if self.verbose:
+                                    print(f"  📁 Found faculty: {faculty_name}")
+                                
+                                # Initialize faculty in our structure
+                                if faculty_key not in faculties_and_majors:
+                                    faculties_and_majors[faculty_key] = {}
+                                
+                                # Now look for majors under this faculty
+                                # Get the parent li element of the faculty link
+                                faculty_li = faculty_link.find_element(By.XPATH, "./..")
+                                
+                                # Look for major sublists within this faculty
+                                major_sublists = faculty_li.find_elements(By.XPATH, "./ul")
+                                
+                                for major_sublist in major_sublists:
+                                    major_links = major_sublist.find_elements(By.XPATH, "./li/a")
+                                    
+                                    for major_link in major_links:
+                                        major_name = major_link.text.strip()
+                                        major_url = major_link.get_attribute('href')
+                                        
+                                        if major_name and major_url and 'divisions' in major_url:
+                                            major_key = self._clean_name(major_name)
+                                            
+                                            faculties_and_majors[faculty_key][major_key] = {
+                                                'name': major_name,
+                                                'url': major_url
+                                            }
+                                            
+                                            if self.verbose:
+                                                print(f"    📄 Found major: {major_name}")
+                
+                except Exception as e:
+                    if self.verbose:
+                        print(f"  Warning: Error processing main item: {e}")
+                    continue
+        
+        except Exception as e:
+            print(f"Error discovering faculties and majors: {e}")
+            return {}
+        
+        total_faculties = len(faculties_and_majors)
+        total_majors = sum(len(majors) for majors in faculties_and_majors.values())
+        
+        if self.verbose:
+            print(f"✅ Discovered {total_faculties} faculties with {total_majors} total majors")
+        
+        return faculties_and_majors
+
     def discover_faculties(self) -> Dict[str, str]:
         """
         Discover all faculties from the UNHAS repository.
@@ -113,40 +201,45 @@ class UNHASRepositoryDiscovery:
         """
         if not self.driver:
             self._init_driver()
-        
+
         if self.verbose:
             print("🔍 Discovering faculties from UNHAS repository...")
+        
         self.driver.get(self.base_url)
         time.sleep(3)
         
         faculties = {}
         
         try:
-            # Get all faculty list items
-            faculty_items = self.driver.find_elements(By.XPATH, "/html/body/div[1]/div/div[2]/div/div[2]/div/ul/li")
+            # Use the new XPath pattern you provided
+            # Faculty links are at: /html/body/div[1]/div/div[2]/div/ul/li/ul[1]/li/a, etc.
+            main_list_items = self.driver.find_elements(By.XPATH, "/html/body/div[1]/div/div[2]/div/ul/li")
             
-            for i, faculty_item in enumerate(faculty_items, 1):
+            for main_item in main_list_items:
                 try:
-                    # Try to find faculty links within this item
-                    faculty_links = faculty_item.find_elements(By.XPATH, "./ul/li/a")
+                    # Look for faculty sublists within this main item
+                    faculty_sublists = main_item.find_elements(By.XPATH, "./ul")
                     
-                    for link_element in faculty_links:
-                        faculty_name = link_element.text.strip()
-                        faculty_url = link_element.get_attribute('href')
+                    for faculty_sublist in faculty_sublists:
+                        # Get faculty links
+                        faculty_links = faculty_sublist.find_elements(By.XPATH, "./li/a")
                         
-                        if faculty_name and faculty_url:
-                            # Clean up faculty name for use as key
-                            faculty_key = self._clean_name(faculty_name)
-                            faculties[faculty_key] = {
-                                'name': faculty_name,
-                                'url': faculty_url
-                            }
-                            if self.verbose:
-                                print(f"  Found faculty: {faculty_name}")
+                        for faculty_link in faculty_links:
+                            faculty_name = faculty_link.text.strip()
+                            faculty_url = faculty_link.get_attribute('href')
+                            
+                            if faculty_name and faculty_url and 'divisions' in faculty_url:
+                                faculty_key = self._clean_name(faculty_name)
+                                faculties[faculty_key] = {
+                                    'name': faculty_name,
+                                    'url': faculty_url
+                                }
+                                if self.verbose:
+                                    print(f"  Found faculty: {faculty_name}")
                 
                 except Exception as e:
                     if self.verbose:
-                        print(f"  Warning: Error processing faculty item {i}: {e}")
+                        print(f"  Warning: Error processing main item: {e}")
                     continue
         
         except Exception as e:
@@ -156,52 +249,85 @@ class UNHASRepositoryDiscovery:
         if self.verbose:
             print(f"✅ Discovered {len(faculties)} faculties")
         return faculties
-    
-    def discover_majors_for_faculty(self, faculty_url: str, faculty_name: str) -> Dict[str, str]:
+
+    def discover_majors_for_faculty_from_main_page(self, faculty_name: str) -> Dict[str, str]:
         """
-        Discover all majors for a specific faculty.
+        Discover all majors for a specific faculty from the main divisions page.
+        This is more efficient than navigating to individual faculty pages.
         
         Args:
-            faculty_url: URL of the faculty page
-            faculty_name: Name of the faculty for logging
+            faculty_name: Name of the faculty to find majors for
             
         Returns:
             Dict mapping major names to their URLs
         """
         if not self.driver:
             self._init_driver()
-        
+
         if self.verbose:
-            print(f"🔍 Discovering majors for {faculty_name}...")
-        self.driver.get(faculty_url)
-        time.sleep(2)
+            print(f"🔍 Discovering majors for {faculty_name} from main divisions page...")
+        
+        self.driver.get(self.base_url)
+        time.sleep(3)
         
         majors = {}
         
         try:
-            # Look for major links in the faculty page
-            # Based on your xpath pattern: /html/body/div[1]/div/div[2]/div/div[2]/div/ul/li/ul/li/ul[1]/li/a
-            major_elements = self.driver.find_elements(By.XPATH, 
-                "/html/body/div[1]/div/div[2]/div/div[2]/div/ul/li/ul/li/ul//li/a")
+            # Get all main list items
+            main_list_items = self.driver.find_elements(By.XPATH, "/html/body/div[1]/div/div[2]/div/ul/li")
             
-            for major_element in major_elements:
+            for main_item in main_list_items:
                 try:
-                    major_name = major_element.text.strip()
-                    major_url = major_element.get_attribute('href')
+                    # Look for faculty sublists within this main item
+                    faculty_sublists = main_item.find_elements(By.XPATH, "./ul")
                     
-                    if major_name and major_url and 'divisions' in major_url:
-                        # Clean up major name for use as key
-                        major_key = self._clean_name(major_name)
-                        majors[major_key] = {
-                            'name': major_name,
-                            'url': major_url
-                        }
-                        if self.verbose:
-                            print(f"  Found major: {major_name}")
+                    for faculty_sublist in faculty_sublists:
+                        # Get faculty links
+                        faculty_links = faculty_sublist.find_elements(By.XPATH, "./li/a")
+                        
+                        for faculty_link in faculty_links:
+                            current_faculty_name = faculty_link.text.strip()
+                            
+                            # Check if this is the faculty we're looking for
+                            if current_faculty_name.lower() == faculty_name.lower():
+                                if self.verbose:
+                                    print(f"  📁 Found target faculty: {current_faculty_name}")
+                                
+                                # Get the parent li element of the faculty link
+                                faculty_li = faculty_link.find_element(By.XPATH, "./..")
+                                
+                                # Look for major sublists within this faculty
+                                major_sublists = faculty_li.find_elements(By.XPATH, "./ul")
+                                
+                                for major_sublist in major_sublists:
+                                    major_links = major_sublist.find_elements(By.XPATH, "./li/a")
+                                    
+                                    for major_link in major_links:
+                                        major_name = major_link.text.strip()
+                                        major_url = major_link.get_attribute('href')
+                                        
+                                        if major_name and major_url and 'divisions' in major_url:
+                                            major_key = self._clean_name(major_name)
+                                            majors[major_key] = {
+                                                'name': major_name,
+                                                'url': major_url
+                                            }
+                                            if self.verbose:
+                                                print(f"    📄 Found major: {major_name}")
+                                
+                                # Found the faculty, no need to continue searching
+                                if majors:
+                                    break
+                        
+                        if majors:
+                            break
+                    
+                    if majors:
+                        break
                 
                 except Exception as e:
                     if self.verbose:
-                        print(f"  Warning: Error processing major element: {e}")
+                        print(f"  Warning: Error processing main item: {e}")
                     continue
         
         except Exception as e:
@@ -211,10 +337,10 @@ class UNHASRepositoryDiscovery:
         if self.verbose:
             print(f"✅ Discovered {len(majors)} majors for {faculty_name}")
         return majors
-    
+
     def discover_all_faculties_and_majors(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         """
-        Discover all faculties and their majors.
+        Discover all faculties and their majors efficiently from the main page.
         
         Returns:
             Nested dict: {faculty_key: {major_key: {'name': str, 'url': str}}}
@@ -222,31 +348,31 @@ class UNHASRepositoryDiscovery:
         try:
             self._init_driver()
             
-            # First discover all faculties
-            faculties = self.discover_faculties()
+            # Use the new efficient method that gets everything from one page
+            full_structure = self.discover_faculties_and_majors_from_main_page()
             
-            if not faculties:
-                print("❌ No faculties discovered")
+            if not full_structure:
+                print("❌ No faculties and majors discovered")
                 return {}
-            
-            # Then discover majors for each faculty
-            full_structure = {}
-            
-            for faculty_key, faculty_info in faculties.items():
-                faculty_name = faculty_info['name']
-                faculty_url = faculty_info['url']
-                
-                majors = self.discover_majors_for_faculty(faculty_url, faculty_name)
-                
-                if majors:
-                    full_structure[faculty_key] = majors
-                else:
-                    print(f"⚠️  No majors found for {faculty_name}")
             
             return full_structure
         
         finally:
             self._close_driver()
+
+    def discover_majors_for_faculty(self, faculty_url: str, faculty_name: str) -> Dict[str, str]:
+        """
+        Discover all majors for a specific faculty.
+        Now uses the main page method for efficiency.
+        
+        Args:
+            faculty_url: URL of the faculty page (not used in new implementation)
+            faculty_name: Name of the faculty for logging
+            
+        Returns:
+            Dict mapping major names to their URLs
+        """
+        return self.discover_majors_for_faculty_from_main_page(faculty_name)
 
     def discover_majors_for_faculty_on_demand(self, config: Config, faculty_key: str) -> Config:
         """
@@ -334,8 +460,8 @@ class UNHASRepositoryDiscovery:
     
     def update_config_with_discovered_data(self, config: Config) -> Config:
         """
-        Update a configuration object with discovered faculty data only.
-        Majors will be discovered on-demand when needed.
+        Update a configuration object with discovered faculty and major data efficiently.
+        Now uses the new main page discovery method to get everything at once.
         
         Args:
             config: Configuration object to update
@@ -344,41 +470,61 @@ class UNHASRepositoryDiscovery:
             Updated configuration object
         """
         if self.verbose:
-            print("🔄 Updating configuration with discovered faculty data...")
+            print("🔄 Updating configuration with discovered faculty and major data...")
         
-        # Only discover faculties initially
-        faculties_info = self.discover_faculties()
-        
-        if faculties_info:
-            # Convert to the format expected by Config, with empty majors initially
-            config_faculties = {}
+        try:
+            self._init_driver()
             
-            for faculty_key, faculty_info in faculties_info.items():
-                config_faculties[faculty_key] = {
-                    'display_name': faculty_info['name'],
-                    'majors': {}  # Empty initially, will be populated on-demand
-                }
+            # Use the new efficient method to get all faculties and majors at once
+            faculties_and_majors = self.discover_faculties_and_majors_from_main_page()
             
-            # Update the configuration
-            config.faculties = config_faculties
-            
-            print(f"✅ Configuration updated with {len(config_faculties)} faculties")
-            
-            # Also update the classification categories to be user-configurable
-            if not hasattr(config, 'user_defined_categories') or not config.user_defined_categories:
-                config.classification_categories = {
-                    "default": {
-                        "Teori": "Penelitian yang fokus pada pengembangan teori dan konsep fundamental.",
-                        "Aplikasi": "Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.",
-                        "Eksperimental": "Penelitian yang melibatkan eksperimen dan pengujian empiris.",
-                        "Komputasi": "Penelitian yang menggunakan metode komputasi dan simulasi.",
-                        "Analisis Data": "Penelitian yang fokus pada analisis dan interpretasi data.",
-                        "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
+            if faculties_and_majors:
+                # Convert to the format expected by Config
+                config_faculties = {}
+                
+                for faculty_key, majors_dict in faculties_and_majors.items():
+                    # Get faculty display name from the first major if available
+                    faculty_display_name = faculty_key.replace('-', ' ').title()
+                    
+                    # Convert majors to the expected format
+                    config_majors = {}
+                    for major_key, major_info in majors_dict.items():
+                        config_majors[major_key] = {
+                            'display_name': major_info['name'],
+                            'url': major_info['url']
+                        }
+                    
+                    config_faculties[faculty_key] = {
+                        'display_name': faculty_display_name,
+                        'majors': config_majors
                     }
-                }
-        else:
-            if self.verbose:
-                print("⚠️  No data discovered, keeping existing configuration")
+                
+                # Update the configuration
+                config.faculties = config_faculties
+                
+                total_faculties = len(config_faculties)
+                total_majors = sum(len(faculty_data['majors']) for faculty_data in config_faculties.values())
+                
+                print(f"✅ Configuration updated with {total_faculties} faculties and {total_majors} majors")
+                
+                # Also update the classification categories to be user-configurable
+                if not hasattr(config, 'user_defined_categories') or not config.user_defined_categories:
+                    config.classification_categories = {
+                        "default": {
+                            "Teori": "Penelitian yang fokus pada pengembangan teori dan konsep fundamental.",
+                            "Aplikasi": "Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.",
+                            "Eksperimental": "Penelitian yang melibatkan eksperimen dan pengujian empiris.",
+                            "Komputasi": "Penelitian yang menggunakan metode komputasi dan simulasi.",
+                            "Analisis Data": "Penelitian yang fokus pada analisis dan interpretasi data.",
+                            "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
+                        }
+                    }
+            else:
+                if self.verbose:
+                    print("⚠️  No data discovered, keeping existing configuration")
+            
+        finally:
+            self._close_driver()
         
         return config
 
