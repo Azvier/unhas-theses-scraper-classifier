@@ -70,15 +70,13 @@ class Config:
     verbose_logging: bool = False  # Set to True for detailed discovery logs
     
     # Classification Categories per Major (moved to top for better visibility)
-    classification_categories: Dict[str, Dict[str, str]] = field(default_factory=lambda: {
-        "default": {
-            "Teori": "Penelitian yang fokus pada pengembangan teori dan konsep fundamental.",
-            "Aplikasi": "Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.",
-            "Eksperimental": "Penelitian yang melibatkan eksperimen dan pengujian empiris.",
-            "Komputasi": "Penelitian yang menggunakan metode komputasi dan simulasi.",
-            "Analisis Data": "Penelitian yang fokus pada analisis dan interpretasi data.",
-            "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
-        }
+    classification_categories: Dict[str, str] = field(default_factory=lambda: {
+        "Teori": "Penelitian yang fokus pada pengembangan teori dan konsep fundamental.",
+        "Aplikasi": "Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.",
+        "Eksperimental": "Penelitian yang melibatkan eksperimen dan pengujian empiris.",
+        "Komputasi": "Penelitian yang menggunakan metode komputasi dan simulasi.",
+        "Analisis Data": "Penelitian yang fokus pada analisis dan interpretasi data.",
+        "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
     })
     
     # Faculty and Major Configuration (auto-populated, should be at bottom)
@@ -120,31 +118,28 @@ class Config:
             # Classification Categories
             f.write("# Classification Categories\n")
             f.write("classification_categories:\n")
-            for major, categories in self.classification_categories.items():
-                f.write(f"  {major}:\n")
-                for category, description in categories.items():
-                    # Handle multi-line descriptions properly
-                    if '\n' in description:
-                        f.write(f"    {category}: |\n")
-                        for line in description.split('\n'):
-                            f.write(f"      {line}\n")
-                    else:
-                        f.write(f"    {category}: {description}\n")
+            for category, description in self.classification_categories.items():
+                # Handle multi-line descriptions properly
+                if '\n' in description:
+                    f.write(f"  {category}: |\n")
+                    for line in description.split('\n'):
+                        f.write(f"    {line}\n")
+                else:
+                    f.write(f"  {category}: {description}\n")
             f.write("\n# NOTE: Please customize these categories for your research domain!\n")
             f.write("# Make sure distinctions between categories are clear to prevent misclassification.\n")
             f.write("# Below is an example of how you might define categories for classification task for statistics major:\n\n")
             f.write("# classification_categories:\n")
-            f.write("#   default:\n")
-            f.write("#     Regresi: Fokus pada **inferensi statistik** untuk memahami dan mengukur hubungan antar variabel menggunakan model dengan **bentuk fungsional yang telah ditentukan** (misalnya, linear, logistik). Tujuan utamanya adalah menjelaskan *seberapa besar* pengaruh satu variabel terhadap variabel lain.\n")
-            f.write("#     Regresi Nonparametrik: Fokus pada pemodelan hubungan antar variabel **TANPA asumsi bentuk fungsional tertentu**. Metode ini sangat fleksibel dan digunakan ketika pola data kompleks, non-linear, dan tidak diketahui sebelumnya. Tujuannya adalah membiarkan data 'berbicara' untuk membentuk modelnya sendiri.\n")
-            f.write("#     Pengendalian Kualitas Statistika: Fokus pada **pemantauan (monitoring) proses yang sedang berjalan** untuk memastikan stabilitas dan konsistensi output. Alat utamanya adalah **peta kendali (control chart)** untuk mendeteksi variasi yang tidak wajar secara visual dan menjaga proses tetap dalam spesifikasi.\n")
-            f.write("#     Perancangan Percobaan: Fokus pada **perancangan eksperimen secara proaktif SEBELUM data dikumpulkan**. Tujuannya adalah untuk secara efisien membandingkan efek dari berbagai **perlakuan (treatments)** melalui intervensi aktif untuk menemukan pengaturan atau kondisi yang paling optimal.\n")
-            f.write("#     Analisis Runtun Waktu: Fokus pada **analisis data yang variabel utamanya adalah waktu**. Metode ini secara khusus menangani data dengan **ketergantungan temporal** (nilai saat ini dipengaruhi oleh nilai sebelumnya). Tujuan utamanya adalah memahami pola historis dan melakukan **peramalan (forecasting)**.\n")
-            f.write("#     Machine Learning: Fokus utama pada **akurasi prediksi**. Tujuannya adalah membangun algoritma yang dapat belajar dari data untuk membuat prediksi atau klasifikasi seakurat mungkin, seringkali **mengorbankan interpretasi model** demi performa prediktif yang superior.\n")
-            f.write("#     Analisis Data Spasial: Fokus pada **analisis data yang variabel utamanya adalah lokasi geografis**. Metode ini secara khusus menangani data dengan **ketergantungan spasial** (nilai di satu lokasi dipengaruhi oleh nilai di lokasi tetangganya). Fokus utamanya adalah pemetaan dan pemodelan **autokorelasi spasial**.\n")
-            f.write("#     Analisis Survival: Fokus pada **metode statistik khusus untuk menganalisis data 'waktu-ke-kejadian' (time-to-event)**. Fokusnya adalah memodelkan waktu hingga suatu peristiwa terjadi dan menangani **data tersensor (censored data)**, di mana peristiwa tersebut tidak diamati untuk semua subjek.\n")
-            f.write("#     Ekonometrika dan Manajemen Risiko: Fokus pada **aplikasi statistik khusus pada data keuangan dan ekonomi** untuk mengukur dan mengelola risiko. Fokus utamanya adalah kuantifikasi risiko investasi melalui metrik seperti **Value at Risk (VaR) dan CVaR**, pemodelan portofolio, dan analisis dependensi aset.\n")
-            f.write("#     Lainnya: Fokus pada **kategori untuk metodologi statistik yang tidak memiliki karakteristik unik dari kategori lain yang telah disebutkan**. Contohnya meliputi **psikometri, bioinformatika, atau analisis data kategorik murni**.\n\n")
+            f.write("#   Regresi: Fokus pada **inferensi statistik** untuk memahami dan mengukur hubungan antar variabel menggunakan model dengan **bentuk fungsional yang telah ditentukan** (misalnya, linear, logistik). Tujuan utamanya adalah menjelaskan *seberapa besar* pengaruh satu variabel terhadap variabel lain.\n")
+            f.write("#   Regresi Nonparametrik: Fokus pada pemodelan hubungan antar variabel **TANPA asumsi bentuk fungsional tertentu**. Metode ini sangat fleksibel dan digunakan ketika pola data kompleks, non-linear, dan tidak diketahui sebelumnya. Tujuannya adalah membiarkan data 'berbicara' untuk membentuk modelnya sendiri.\n")
+            f.write("#   Pengendalian Kualitas Statistika: Fokus pada **pemantauan (monitoring) proses yang sedang berjalan** untuk memastikan stabilitas dan konsistensi output. Alat utamanya adalah **peta kendali (control chart)** untuk mendeteksi variasi yang tidak wajar secara visual dan menjaga proses tetap dalam spesifikasi.\n")
+            f.write("#   Perancangan Percobaan: Fokus pada **perancangan eksperimen secara proaktif SEBELUM data dikumpulkan**. Tujuannya adalah untuk secara efisien membandingkan efek dari berbagai **perlakuan (treatments)** melalui intervensi aktif untuk menemukan pengaturan atau kondisi yang paling optimal.\n")
+            f.write("#   Analisis Runtun Waktu: Fokus pada **analisis data yang variabel utamanya adalah waktu**. Metode ini secara khusus menangani data dengan **ketergantungan temporal** (nilai saat ini dipengaruhi oleh nilai sebelumnya). Tujuan utamanya adalah memahami pola historis dan melakukan **peramalan (forecasting)**.\n")
+            f.write("#   Machine Learning: Fokus utama pada **akurasi prediksi**. Tujuannya adalah membangun algoritma yang dapat belajar dari data untuk membuat prediksi atau klasifikasi seakurat mungkin, seringkali **mengorbankan interpretasi model** demi performa prediktif yang superior.\n")
+            f.write("#   Analisis Data Spasial: Fokus pada **analisis data yang variabel utamanya adalah lokasi geografis**. Metode ini secara khusus menangani data dengan **ketergantungan spasial** (nilai di satu lokasi dipengaruhi oleh nilai di lokasi tetangganya). Fokus utamanya adalah pemetaan dan pemodelan **autokorelasi spasial**.\n")
+            f.write("#   Analisis Survival: Fokus pada **metode statistik khusus untuk menganalisis data 'waktu-ke-kejadian' (time-to-event)**. Fokusnya adalah memodelkan waktu hingga suatu peristiwa terjadi dan menangani **data tersensor (censored data)**, di mana peristiwa tersebut tidak diamati untuk semua subjek.\n")
+            f.write("#   Ekonometrika dan Manajemen Risiko: Fokus pada **aplikasi statistik khusus pada data keuangan dan ekonomi** untuk mengukur dan mengelola risiko. Fokus utamanya adalah kuantifikasi risiko investasi melalui metrik seperti **Value at Risk (VaR) dan CVaR**, pemodelan portofolio, dan analisis dependensi aset.\n")
+            f.write("#   Lainnya: Fokus pada **kategori untuk metodologi statistik yang tidak memiliki karakteristik unik dari kategori lain yang telah disebutkan**. Contohnya meliputi **psikometri, bioinformatika, atau analisis data kategorik murni**.\n\n")
             
             # Add separator for auto-generated content
             f.write("#" + "="*70 + "\n")
@@ -237,7 +232,10 @@ def _update_config_from_dict(config: Config, config_dict: Dict[str, Any]):
     """Update config object from dictionary, handling nested structures."""
     for key, value in config_dict.items():
         if hasattr(config, key):
-            if isinstance(value, dict) and isinstance(getattr(config, key), dict):
+            if key == 'classification_categories':
+                # For classification categories, replace completely instead of merging
+                setattr(config, key, value)
+            elif isinstance(value, dict) and isinstance(getattr(config, key), dict):
                 # Handle nested dictionaries
                 current_value = getattr(config, key)
                 current_value.update(value)
@@ -383,10 +381,7 @@ def validate_config(config: Config) -> None:
             console.print("[yellow]You can manually run: pdm run python main.py discover[/yellow]")
     
     # Classification categories validation
-    major_categories = config.classification_categories.get(
-        config.target_major, 
-        config.classification_categories.get("default", {})
-    )
+    major_categories = config.classification_categories
     
     if not major_categories:
         raise ValueError(
@@ -552,13 +547,13 @@ def validate_and_prompt_categories(config: Config) -> Config:
             "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
         }
         
-        current_default = config.classification_categories.get("default", {})
+        current_categories = config.classification_categories
         
-        if current_default == default_categories:
+        if current_categories == default_categories:
             console.print("\n[yellow]⚠️  CLASSIFICATION CATEGORIES REVIEW NEEDED[/yellow]")
             console.print("[dim]You are currently using generic default categories:[/dim]")
             
-            for i, (category, description) in enumerate(current_default.items(), 1):
+            for i, (category, description) in enumerate(current_categories.items(), 1):
                 console.print(f"  {i}. [cyan]{category}[/cyan]: {description}")
             
             console.print("\n[red]For better classification accuracy, you should customize these![/red]")
@@ -600,15 +595,15 @@ def validate_and_prompt_categories(config: Config) -> Config:
                         updated_config = load_config("config.yaml", validate=False)
                         
                         # Check if categories were actually changed
-                        updated_default = updated_config.classification_categories.get("default", {})
+                        updated_categories = updated_config.classification_categories
                         
-                        if updated_default != default_categories:
+                        if updated_categories != default_categories:
                             console.print("[green]✅ Custom categories detected! Great work![/green]")
-                            console.print(f"[dim]Found {len(updated_default)} custom categories[/dim]")
+                            console.print(f"[dim]Found {len(updated_categories)} custom categories[/dim]")
                             
                             # Show the new categories
                             console.print("\n[cyan]Your custom categories:[/cyan]")
-                            for i, (category, description) in enumerate(updated_default.items(), 1):
+                            for i, (category, description) in enumerate(updated_categories.items(), 1):
                                 console.print(f"  {i}. [green]{category}[/green]: {description}")
                             
                             # Check if user_defined_categories flag was set

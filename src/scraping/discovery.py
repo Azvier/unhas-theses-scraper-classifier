@@ -510,14 +510,12 @@ class UNHASRepositoryDiscovery:
                 # Also update the classification categories to be user-configurable
                 if not hasattr(config, 'user_defined_categories') or not config.user_defined_categories:
                     config.classification_categories = {
-                        "default": {
-                            "Teori": "Penelitian yang fokus pada pengembangan teori dan konsep fundamental.",
-                            "Aplikasi": "Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.",
-                            "Eksperimental": "Penelitian yang melibatkan eksperimen dan pengujian empiris.",
-                            "Komputasi": "Penelitian yang menggunakan metode komputasi dan simulasi.",
-                            "Analisis Data": "Penelitian yang fokus pada analisis dan interpretasi data.",
-                            "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
-                        }
+                        "Teori": "Penelitian yang fokus pada pengembangan teori dan konsep fundamental.",
+                        "Aplikasi": "Penelitian yang fokus pada penerapan teori untuk memecahkan masalah praktis.",
+                        "Eksperimental": "Penelitian yang melibatkan eksperimen dan pengujian empiris.",
+                        "Komputasi": "Penelitian yang menggunakan metode komputasi dan simulasi.",
+                        "Analisis Data": "Penelitian yang fokus pada analisis dan interpretasi data.",
+                        "Lainnya": "Kategori untuk penelitian yang tidak termasuk dalam kategori lain."
                     }
             else:
                 if self.verbose:

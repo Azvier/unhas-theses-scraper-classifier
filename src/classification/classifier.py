@@ -52,11 +52,8 @@ def extract_faculty_major_from_filename(input_path: str) -> tuple:
 
 def get_categories_for_major(config: Config) -> dict:
     """Get classification categories for the specified major."""
-    major_categories = config.classification_categories.get(
-        config.target_major,
-        config.classification_categories.get("default", {})
-    )
-    return major_categories
+    # Now categories are stored directly without the 'default' wrapper
+    return config.classification_categories
 
 
 def generate_classification_prompt(batch_items, categories: dict):
