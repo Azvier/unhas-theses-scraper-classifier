@@ -291,7 +291,10 @@ class ApplicationOrchestrator:
             self.config.faculties = discovered_data
             config_service.save_config(self.config, self.config_path)
             
-            self.ui.display_success(f"Discovery completed! Found {len(discovered_data)} faculties")
+            # Calculate total majors across all faculties
+            total_majors = sum(len(faculty_data.get('majors', {})) for faculty_data in discovered_data.values())
+            
+            self.ui.display_success(f"Discovery completed! Found {len(discovered_data)} faculties and {total_majors} majors")
             self.ui.display_info(f"Configuration updated: {self.config_path}")
             
             return True
